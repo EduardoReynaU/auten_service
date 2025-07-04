@@ -1,0 +1,25 @@
+{
+  "name": "auten_service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/infrastructure/index.js",
+    "dev": "nodemon src/infrastructure/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "apollo-server": "^3.13.0",
+    "axios": "^1.10.0",
+    "dotenv": "^17.0.1",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.16.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
