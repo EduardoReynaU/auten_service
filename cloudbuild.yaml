@@ -1,0 +1,33 @@
+steps:
+  # Paso 1: Construir imagen Docker desde Dockerfile
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/auten-repo/auten-service',
+      '.'
+    ]
+
+  # Paso 2: Subir imagen al Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'push',
+      'us-central1-docker.pkg.dev/$PROJECT_ID/auten-repo/auten-service'
+    ]
+
+  # Paso 3: Desplegar a Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [
+      'run', 'deploy', 'auten-service',
+      '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/auten-repo/auten-service',
+      '--region', 'us-central1',
+      '--platform', 'managed',
+      '--allow-unauthenticated',
+      '--port', '3000'
+    ]
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/auten-repo/auten-service'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
