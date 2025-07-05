@@ -11,6 +11,7 @@ module.exports = gql`
     providerId: String
     avatarUrl: String
     topLanguages: [String]
+    token: String 
   }
 
   input UserInput {

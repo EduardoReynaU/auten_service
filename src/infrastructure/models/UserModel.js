@@ -9,7 +9,8 @@ const UserSchema = new mongoose.Schema({
   provider: String,
   providerId: String,
   avatarUrl: String,
-  topLanguages: [String]
+  topLanguages: [String],
+  token: String
 });
 
 module.exports = mongoose.model('users', UserSchema);
