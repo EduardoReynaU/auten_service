@@ -1,8 +1,12 @@
 const express = require('express');
 const http = require('http');
-const { ApolloServer } = require('@apollo/subgraph'); // Cambiado a Apollo Federation
+const { expressMiddleware } = require('@apollo/server/express4');
+const { ApolloServer } = require('@apollo/server');
 const { buildSubgraphSchema } = require('@apollo/subgraph');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+
 const typeDefs = require('../adapters/input/graphql/typeDefs');
 const createResolvers = require('../adapters/input/graphql/resolvers/userResolver');
 const container = require('../config/container');
@@ -14,7 +18,7 @@ async function startServer() {
   const app = express();
   const resolvers = createResolvers(container);
 
-  // 🔁 Ruta para redirigir el code de GitHub al frontend
+  // Redirección del code de GitHub al frontend
   app.get('/callback', (req, res) => {
     const { code } = req.query;
     if (!code) {
@@ -23,36 +27,39 @@ async function startServer() {
     res.redirect(`${FRONTEND_URL}/login?code=${code}`);
   });
 
-  // 📦 Crear esquema federado
-  const schema = buildSubgraphSchema({ typeDefs, resolvers });
+  const httpServer = http.createServer(app);
 
-  // 🚀 Servidor Apollo federado
   const server = new ApolloServer({
-    schema,
-    context: ({ req }) => {
-      const authHeader = req.headers.authorization || '';
-      const token = authHeader.replace('Bearer ', '');
-
-      if (!token) return { user: null };
-
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        return { user: decoded };
-      } catch (error) {
-        console.warn('Token inválido o expirado');
-        return { user: null };
-      }
-    }
+    schema: buildSubgraphSchema({ typeDefs, resolvers }),
   });
 
   await server.start();
-  server.applyMiddleware({ app });
 
-  const httpServer = http.createServer(app);
+  app.use(
+    '/graphql',
+    cors(),
+    bodyParser.json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const authHeader = req.headers.authorization || '';
+        const token = authHeader.replace('Bearer ', '');
+
+        if (!token) return { user: null };
+
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET);
+          return { user: decoded };
+        } catch (err) {
+          console.warn('Token inválido o expirado');
+          return { user: null };
+        }
+      },
+    })
+  );
+
   const PORT = process.env.PORT || 3000;
-
   httpServer.listen(PORT, () => {
-    console.log(`🚀 Servidor GraphQL federado en http://localhost:${PORT}${server.graphqlPath}`);
+    console.log(`🚀 Servidor Apollo Subgraph corriendo en http://localhost:${PORT}/graphql`);
     console.log(`🔁 Redirección /callback activa`);
   });
 }
