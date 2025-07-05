@@ -1,7 +1,10 @@
 const { gql } = require('apollo-server');
 
 module.exports = gql`
-  type User {
+  # Extensión para Federation
+  directive @key(fields: String!) on OBJECT | INTERFACE
+
+  type User @key(fields: "id") {
     id: ID
     names: String
     lastName: String
@@ -27,34 +30,14 @@ module.exports = gql`
   }
 
   type Query {
-    _: String
-  }
-
-  type Mutation {
-    registerUserWithGithub(code: String): User
-    createTestUser(input: UserInput!): User
-  }
-
-  type Query {
-    getUserById(id: ID!): User
-  }
-
-  type Query {
-    getUserById(id: ID!): User
-    getAllUsers: [User]
-  }
- 
-  type Mutation {
-    registerUserWithGithub(code: String!): User
-    createTestUser(input: UserInput!): User
-    updateUserById(id: ID!, input: UserInput!): User
-  }
-
-  type Query {
     getUserById(id: ID!): User
     getUserByEmail(email: String!): User
     getAllUsers: [User]
   }
 
-
+  type Mutation {
+    registerUserWithGithub(code: String!): User
+    createTestUser(input: UserInput!): User
+    updateUserById(id: ID!, input: UserInput!): User
+  }
 `;

@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer } = require('@apollo/subgraph'); // Cambiado a Apollo Federation
+const { buildSubgraphSchema } = require('@apollo/subgraph');
 const jwt = require('jsonwebtoken');
 const typeDefs = require('../adapters/input/graphql/typeDefs');
 const createResolvers = require('../adapters/input/graphql/resolvers/userResolver');
@@ -13,19 +14,21 @@ async function startServer() {
   const app = express();
   const resolvers = createResolvers(container);
 
-  // Ruta para redirigir el code de GitHub al frontend
+  // 🔁 Ruta para redirigir el code de GitHub al frontend
   app.get('/callback', (req, res) => {
     const { code } = req.query;
     if (!code) {
       return res.status(400).send('No se proporcionó el código');
     }
-    // Redirige al frontend con el código como query param
     res.redirect(`${FRONTEND_URL}/login?code=${code}`);
   });
 
+  // 📦 Crear esquema federado
+  const schema = buildSubgraphSchema({ typeDefs, resolvers });
+
+  // 🚀 Servidor Apollo federado
   const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+    schema,
     context: ({ req }) => {
       const authHeader = req.headers.authorization || '';
       const token = authHeader.replace('Bearer ', '');
@@ -39,7 +42,7 @@ async function startServer() {
         console.warn('Token inválido o expirado');
         return { user: null };
       }
-    },
+    }
   });
 
   await server.start();
@@ -49,7 +52,7 @@ async function startServer() {
   const PORT = process.env.PORT || 3000;
 
   httpServer.listen(PORT, () => {
-    console.log(`🚀 Servidor GraphQL listo en http://localhost:${PORT}${server.graphqlPath}`);
+    console.log(`🚀 Servidor GraphQL federado en http://localhost:${PORT}${server.graphqlPath}`);
     console.log(`🔁 Redirección /callback activa`);
   });
 }

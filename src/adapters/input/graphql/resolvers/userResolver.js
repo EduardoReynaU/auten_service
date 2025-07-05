@@ -42,5 +42,13 @@ module.exports = (container) => ({
       const userRepository = container.resolve('userRepository');
       return await userRepository.updateById(id, input);
     }
+  },
+
+  // 🧩 Resolver para federación
+  User: {
+    __resolveReference: async ({ id }, _, { user }) => {
+      const userRepository = container.resolve('userRepository');
+      return await userRepository.findById(id);
+    }
   }
 });
