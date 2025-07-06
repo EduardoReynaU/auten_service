@@ -17,8 +17,15 @@ Todos estos módulos usan tecnologías distintas, lo que genera complejidades pa
 
 ## Decision Drivers 
 
-* [driver 1, e.g., a force, facing concern, …]
-* [driver 2, e.g., a force, facing concern, …]
+* Generación automática de candidatos compatibles para un proyecto → Algoritmos de recomendación deben funcionar como microservicio en un contenedor independiente, escalable.
+
+* Visualización estructurada de perfiles compatibles con indicadores de compatibilidad → Necesita desacoplar backends y frontends para facilitar despliegues individuales.
+
+* Recomendación de proyectos personalizados para los usuarios (eliminado) → Aunque eliminado, inicialmente motivó modularización, válida para el resto del sistema.
+
+* Sistema de mensajería interna para conexión entre usuarios → Comunicación asincrónica y procesamiento desacoplado, ideal para contenerizar servicios RabbitMQ y websockets.
+
+
 
 ## Considered Options
 

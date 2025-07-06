@@ -5,6 +5,7 @@ This log lists the architectural decisions for this project.
 <!-- toc -->
 
 * [ADR-0000](0000-uso-de-plataforma-de-contenedores-docker.md) - Uso de Plataforma de Contenedores DOCKER - [accepted]
+* [ADR-0001](0001-uso-de-graphql-federation-como-gateway-de-apis.md) - Uso de GraphQL Federation como Gateway de APIs - [accepted]
 
 <!-- tocstop -->
 
